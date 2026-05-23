@@ -1,0 +1,72 @@
+meta {
+  name: Proxy - Verificar que el Worker responde
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/payments
+  body: none
+  auth: none
+}
+
+params:query {
+  id_pos: pos-terminal-001
+  limit: 1
+  offset: 0
+}
+
+headers {
+  x-api-key: {{apiKey}}
+  x-correlation-id: {{correlationId}}
+  x-request-id: req-proxy-health-001
+}
+
+docs {
+  # Proxy Health — Verificar que el Worker de Cloudflare responde
+
+  Realiza un GET simple contra el proxy para confirmar que:
+  1. El dominio `api.tonyml.com` resuelve correctamente
+  2. El Cloudflare Worker está activo y recibe requests
+  3. El Worker puede alcanzar el backend (GitHub Codespace)
+  4. El routing end-to-end funciona
+
+  ## Respuestas posibles
+
+  ### ✅ 200 OK — Todo funciona
+  ```json
+  []  // lista vacía de pagos si no hay datos
+  ```
+
+  ### ⚠️ 404 Not Found
+  Puede indicar el **BUG #1** del Worker: path stripping incorrecto.
+  El Worker strip `/api` del path → el backend recibe `/v1/payments` en vez de `/api/v1/payments`.
+  ```json
+  {"detail": "Not found"}
+  ```
+
+  ### ⚠️ 401 Unauthorized
+  El Worker (worker_backup.js) está activo y rechazó el API Key.
+  Verificar que `apiKey` en el environment coincide con el secret del Worker.
+
+  ### ⚠️ 502 Bad Gateway
+  El Worker no puede alcanzar el backend. El GitHub Codespace puede estar:
+  - Suspendido por inactividad
+  - Con URL del tunnel cambiada
+  - Sin puerto 8000 expuesto
+
+  ### ⚠️ 503 Service Unavailable
+  El Worker mismo tiene un error o está en mantenimiento.
+
+  ## Cómo diagnosticar
+  ```bash
+  # Ver logs en tiempo real del Worker
+  cd proxy-apy-bridgesimpe
+  wrangler tail --env production
+
+  # Verificar que el backend responde directamente
+  # (usa environment github-codespace y ejecuta el mismo request)
+  ```
+
+  > Usar environment `production` para este test.
+}

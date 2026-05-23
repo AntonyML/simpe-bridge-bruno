@@ -1,0 +1,77 @@
+meta {
+  name: POST - Upload Comprobante (Receipt)
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/uploads/receipts
+  body: multipartForm
+  auth: none
+}
+
+headers {
+  x-api-key: {{apiKey}}
+  x-correlation-id: {{correlationId}}
+  x-request-id: req-upload-receipt-001
+  x-device-id: {{deviceId}}
+}
+
+body:multipart {
+  file: @file(./assets/dummy-receipt.jpg)
+  device_id: {{deviceId}}
+  correlation_id: {{correlationId}}
+  message_id: {{messageId}}
+}
+
+docs {
+  # POST /api/v1/uploads/receipts — Subir Comprobante SINPE
+  
+  Endpoint para subir imágenes de comprobantes de pago SINPE desde el dispositivo Android.
+  Acepta imágenes JPEG, PNG y WebP.
+  
+  ## Campos multipart/form-data
+  | Campo | Tipo | Requerido | Descripción |
+  |-------|------|-----------|-------------|
+  | `file` | File | ✅ Sí | Imagen del comprobante (JPEG, PNG, WebP) |
+  | `device_id` | string | ✅ Sí | Identificador del dispositivo Android |
+  | `correlation_id` | string | ✅ Sí | UUID de correlación del request |
+  | `message_id` | string | No | UUID del mensaje SINPE relacionado |
+  
+  ## Tipos de imagen soportados (ImageType enum)
+  | Valor | Descripción |
+  |-------|-------------|
+  | `receipt_qr` | Comprobante con QR |
+  | `sinpe_screenshot` | Screenshot de la app SINPE |
+  | `bank_transfer_proof` | Comprobante de transferencia bancaria |
+  | `fraud_evidence` | Evidencia de fraude |
+  
+  ## Respuesta 200 - UploadResponse
+  ```json
+  {
+    "upload_id": "uuid-generado",
+    "file_path": "/uploads/receipts/2025/01/01/uuid.jpg",
+    "file_size": 245760,
+    "mime_type": "image/jpeg",
+    "image_type": "receipt_qr",
+    "correlation_id": "uuid",
+    "message_id": "uuid",
+    "created_at": "2025-01-01T10:00:00"
+  }
+  ```
+  
+  ## Límites
+  - Tamaño máximo: 100 MB (`MAX_UPLOAD_SIZE=104857600`)
+  - Tipos aceptados: `image/jpeg`, `image/png`, `image/webp`
+  
+  ## Cómo probar
+  1. Reemplazar `./assets/dummy-receipt.jpg` con una imagen real en tu sistema
+  2. O crear el dummy ejecutando el script de assets incluido
+  
+  ## ⚠️ INCONSISTENCIA DETECTADA (ver README)
+  El `uploads.py` define su propio prefix `/api/v1/uploads` PERO también
+  se monta en `api_router` que ya tiene prefix `/api/v1`.
+  Resultado en código: la ruta real sería `/api/v1/api/v1/uploads/receipts` (BUG).
+  La ruta correcta (como dice el README) debería ser `/api/v1/uploads/receipts`.
+  → Solución: eliminar `prefix="/api/v1/uploads"` del router en `uploads.py`
+}

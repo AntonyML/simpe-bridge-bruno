@@ -1,0 +1,28 @@
+SINPE Bridge - Dummy Receipt Image for Testing
+================================================
+
+Este archivo es un PLACEHOLDER para pruebas de upload.
+
+Para probar el endpoint POST /api/v1/uploads/receipts en Bruno:
+
+1. Reemplaza este archivo con una imagen JPEG real (.jpg), o
+2. En Bruno, edita el request 01-upload-receipt.bru y cambia
+   la ruta del campo `file` a una imagen en tu sistema:
+
+   Ejemplo:
+     file: @file(C:/Users/TuUsuario/Pictures/comprobante.jpg)
+
+MIME types aceptados:
+  - image/jpeg (.jpg, .jpeg)
+  - image/png  (.png)
+  - image/webp (.webp)
+
+Tamaño máximo: 100 MB (MAX_UPLOAD_SIZE=104857600 bytes)
+
+Campos requeridos (multipart/form-data):
+  - file          : Archivo de imagen
+  - device_id     : ID del dispositivo (ej: "android-device-001")
+  - correlation_id: UUID de correlación (ej: "a7a74c7c-...")
+  - message_id    : UUID del mensaje SINPE (opcional)
+
+Endpoint: POST {{baseUrl}}/api/v1/uploads/receipts

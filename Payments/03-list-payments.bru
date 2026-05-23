@@ -1,0 +1,59 @@
+meta {
+  name: GET - Listar Mensajes por POS
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/payments
+  body: none
+  auth: none
+}
+
+params:query {
+  id_pos: {{idPos}}
+  limit: 50
+  offset: 0
+}
+
+headers {
+  x-api-key: {{apiKey}}
+  x-correlation-id: {{correlationId}}
+  x-request-id: req-list-payments-001
+}
+
+docs {
+  # GET /api/v1/payments — Listar Mensajes SINPE de un POS
+  
+  Retorna todos los mensajes SINPE recibidos de un POS específico.
+  
+  ## Query Parameters
+  | Parámetro | Tipo | Requerido | Descripción |
+  |-----------|------|-----------|-------------|
+  | `id_pos` | string | ✅ Sí | Identificador del POS |
+  | `limit` | int | No (default 50) | Máximo resultados (1-200) |
+  | `offset` | int | No (default 0) | Paginación |
+  
+  ## Respuesta 200
+  ```json
+  [
+    {
+      "id": "uuid",
+      "message_id": "uuid",
+      "id_pos": "pos-terminal-001",
+      "body": "BCR le informa...",
+      "sender": "+50689649721",
+      "message_timestamp": "2025-01-01T10:00:00",
+      "processed": false,
+      "received_at": "2025-01-01T10:00:01",
+      "purchase_order_id": null
+    }
+  ]
+  ```
+  
+  ## Paginación
+  Usar `limit` y `offset` para paginar:
+  - Página 1: `limit=50&offset=0`
+  - Página 2: `limit=50&offset=50`
+  - Página 3: `limit=50&offset=100`
+}

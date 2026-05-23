@@ -1,0 +1,127 @@
+meta {
+  name: POST - Recibir Mensaje SINPE
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/payments
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  x-api-key: {{apiKey}}
+  x-correlation-id: {{correlationId}}
+  x-request-id: req-89d05111-5134-4e81-a8b4-7d70c25627ab
+  x-trace-id: trace-a7a74c7c-c310-4bbb-8e7d-235ba643e2e6
+  x-device-id: {{deviceId}}
+  x-signature: ae6ec65a980781ed6a32c235354ce3455c6a6df29cfdc3266d9c41893bd40b69
+}
+
+body:json {
+  {
+    "id_pos": "{{idPos}}",
+    "envelope": {
+      "content_hash": "4420ab978bdc4d0f40ac2c7b3ae2d4964cc4522fc1729737f8488a0e12dd96bf",
+      "correlation_id": "{{correlationId}}",
+      "created_at": 1778026351,
+      "device_hash": "{{deviceHash}}",
+      "message_id": "{{messageId}}",
+      "retry_count": 0,
+      "signature": "ae6ec65a980781ed6a32c235354ce3455c6a6df29cfdc3266d9c41893bd40b69",
+      "source": "android-sms-listener",
+      "status": "SENT",
+      "version": "1.0"
+    },
+    "payload": {
+      "body": "BCR le informa: Recibio transferencia SINPE Movil de 50,000.00 colones de JUAN PEREZ el 01/01/2025 a las 10:00. Ref 123456789",
+      "debug": {
+        "format": "3gpp",
+        "pdu": "06910536002500040b910586699427f100006250508121724a03c2a114"
+      },
+      "device": {
+        "sim_slot": -1,
+        "subscription_id": 1
+      },
+      "metadata": {
+        "protocol_id": 0,
+        "service_center": "+5063005200",
+        "status": 0
+      },
+      "multipart": {
+        "ref": 0,
+        "seq": 1,
+        "total": 1
+      },
+      "sender": "+50689649721",
+      "timestamp": 1778026347
+    }
+  }
+}
+
+docs {
+  # POST /api/v1/payments — Recibir Mensaje SINPE
+  
+  La app móvil Android envía un SMS de SINPE Móvil detectado para su validación
+  y conciliación contra órdenes del POS.
+  
+  ## Flujo completo
+  ```
+  Android (SMS detectado)
+    → POST https://api.tonyml.com/api/v1/payments
+    → Cloudflare Worker (valida x-api-key, x-signature)
+    → FastAPI /api/v1/payments
+    → Almacena en DB → 201 Created
+  ```
+  
+  ## Headers requeridos
+  | Header | Descripción |
+  |--------|-------------|
+  | `x-api-key` | API Key compartida entre Worker y backend |
+  | `x-correlation-id` | UUID para rastreo distribuido |
+  | `x-request-id` | UUID único del request |
+  | `x-trace-id` | UUID del trace |
+  | `x-device-id` | Identificador del dispositivo Android |
+  | `x-signature` | HMAC SHA-256 del body con el API Key |
+  
+  ## Body - SinpeMessageCreate
+  
+  | Campo | Tipo | Descripción |
+  |-------|------|-------------|
+  | `id_pos` | string | Identificador del POS (1-64 chars) |
+  | `envelope.content_hash` | string | SHA-256 del payload |
+  | `envelope.correlation_id` | string | UUID de correlación |
+  | `envelope.created_at` | int | Unix timestamp de creación |
+  | `envelope.device_hash` | string | Hash anonimizado del dispositivo |
+  | `envelope.message_id` | string | UUID único del mensaje (idempotencia) |
+  | `envelope.retry_count` | int | Contador de reintentos (default 0) |
+  | `envelope.signature` | string | HMAC SHA-256 del cuerpo |
+  | `envelope.source` | string | Origen (ej: "android-sms-listener") |
+  | `envelope.status` | string | Estado (ej: "SENT") |
+  | `envelope.version` | string | Versión del protocolo (default "1.0") |
+  | `payload.body` | string | Texto crudo del SMS |
+  | `payload.sender` | string | Número del banco remitente |
+  | `payload.timestamp` | int | Unix timestamp del SMS |
+  
+  ## Respuesta 201 - SinpeMessageResponse
+  ```json
+  {
+    "id": "uuid",
+    "message_id": "uuid",
+    "id_pos": "pos-terminal-001",
+    "body": "BCR le informa...",
+    "sender": "+50689649721",
+    "message_timestamp": "2025-01-01T10:00:00",
+    "processed": false,
+    "received_at": "2025-01-01T10:00:01",
+    "purchase_order_id": null
+  }
+  ```
+  
+  ## Seguridad
+  - `message_id` funciona como clave de idempotencia (mismo mensaje no se procesa dos veces)
+  - `envelope.created_at` se valida contra ±5 minutos para prevenir replay attacks
+  - `x-signature` es HMAC SHA-256(body, api_key)
+}

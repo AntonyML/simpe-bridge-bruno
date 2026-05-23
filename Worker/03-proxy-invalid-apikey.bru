@@ -1,0 +1,64 @@
+meta {
+  name: Proxy - Rechazar API Key inválida (401 esperado)
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/payments
+  body: none
+  auth: none
+}
+
+params:query {
+  id_pos: pos-test-001
+  limit: 1
+}
+
+headers {
+  x-api-key: INVALID-API-KEY-12345
+  x-correlation-id: {{correlationId}}
+  x-request-id: req-invalid-key-test-001
+}
+
+docs {
+  # Proxy - Test de rechazo con API Key inválida
+
+  Envía un API Key incorrecto para confirmar que el Worker rechaza
+  correctamente la request con `401 Unauthorized`.
+
+  Este test SOLO funciona si `worker_backup.js` está desplegado como producción.
+  El `worker.js` actual (dumb proxy) NO valida el API Key y retornará cualquier
+  respuesta del backend.
+
+  ## Respuesta esperada (con worker_backup.js activo)
+
+  ### ✅ 401 Unauthorized — Comportamiento correcto
+  ```json
+  {
+    "error": "Unauthorized",
+    "status": 401,
+    "requestId": "uuid-del-request",
+    "timestamp": "2025-01-01T10:00:00.000Z"
+  }
+  ```
+
+  ## Si retorna 200 o cualquier respuesta del backend
+
+  Significa que el `worker.js` actual (sin validación) está activo.
+  El Worker no está chequeando el API Key.
+
+  → **Acción recomendada**: Hacer deploy de `worker_backup.js` para activar seguridad.
+
+  ```bash
+  # En proxy-apy-bridgesimpe:
+  cp src/worker_backup.js src/worker.js
+  # Ajustar BACKEND_URL y corregir BUG #1 del path stripping
+  npm run deploy
+  ```
+
+  ## Headers de la respuesta a revisar
+  - `x-request-id`: UUID generado por el Worker
+  - `x-correlation-id`: Propagado desde el request
+  - `Access-Control-Allow-Origin`: Header CORS del Worker
+}

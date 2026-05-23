@@ -1,0 +1,61 @@
+meta {
+  name: GET - OpenAPI JSON Schema
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/openapi.json
+  body: none
+  auth: none
+}
+
+headers {
+  x-api-key: {{apiKey}}
+  Accept: application/json
+}
+
+docs {
+  # GET /api/v1/openapi.json — Esquema OpenAPI Completo
+
+  Retorna el schema OpenAPI 3.x generado automáticamente por FastAPI.
+  Útil para importar en otros clientes o herramientas de generación de código.
+
+  ## Configurado en main.py
+  ```python
+  app = FastAPI(
+    openapi_url="/api/v1/openapi.json",
+    docs_url="/api/v1/docs",
+    redoc_url=None,
+  )
+  ```
+
+  ## Respuesta 200 — JSON
+  ```json
+  {
+    "openapi": "3.1.0",
+    "info": {
+      "title": "SINPE Bridge API",
+      "description": "Valida pagos SINPE Móvil y los concilia con órdenes del POS.",
+      "version": "1.0.0"
+    },
+    "paths": {
+      "/api/v1/payments": { ... },
+      "/api/v1/orders": { ... },
+      "/api/v1/uploads/receipts": { ... },
+      ...
+    }
+  }
+  ```
+
+  ## Uso práctico
+  - Importar en otras herramientas (Postman, Insomnia, etc.)
+  - Generar clientes SDK automáticos (openapi-generator)
+  - Validar que todos los endpoints estén documentados
+
+  > ⚠️ **NOTA**: Este endpoint sirve JSON directamente.
+  > Usar environment `github-codespace` o `local-fastapi` para accederlo
+  > (no pasa por el Worker proxy ya que la ruta `/api/v1/openapi.json`
+  > puede ser interceptada, pero el Worker actual es un dumb proxy,
+  > así que debería funcionar también con `production`).
+}

@@ -1,0 +1,96 @@
+meta {
+  name: POST - Crear Orden de Compra
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/orders
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  x-api-key: {{apiKey}}
+  x-correlation-id: {{correlationId}}
+  x-request-id: req-create-order-001
+  x-trace-id: trace-create-order-001
+  x-device-id: {{deviceId}}
+}
+
+body:json {
+  {
+    "order_number": "{{orderNumber}}",
+    "id_pos": "{{idPos}}",
+    "amount": 50000.00,
+    "payment_method": "SINPE_MOVIL",
+    "correlation_token": "{{correlationId}}",
+    "ordered_at": "2025-01-01T10:00:00",
+    "expires_at": "2025-01-01T10:15:00",
+    "products": [
+      {
+        "code": "PROD-001",
+        "name": "Casado con pollo",
+        "price": 4500.00,
+        "quantity": 2,
+        "line_total": 9000.00
+      },
+      {
+        "code": "PROD-002",
+        "name": "Refresco natural",
+        "price": 1500.00,
+        "quantity": 3,
+        "line_total": 4500.00
+      },
+      {
+        "code": "PROD-003",
+        "name": "Café negro",
+        "price": 1000.00,
+        "quantity": 2,
+        "line_total": 2000.00
+      }
+    ]
+  }
+}
+
+docs {
+  # POST /api/v1/orders — Crear Orden de Compra
+  
+  El sistema POS registra una nueva orden de compra pendiente de pago.
+  Esta orden queda disponible para ser conciliada con un mensaje SINPE entrante.
+  
+  ## Body - PurchaseOrderCreate
+  | Campo | Tipo | Descripción |
+  |-------|------|-------------|
+  | `order_number` | string | Número único de orden del POS |
+  | `id_pos` | string | Identificador del POS |
+  | `amount` | float | Monto total en colones CRC |
+  | `payment_method` | string | Método de pago (ej: "SINPE_MOVIL") |
+  | `correlation_token` | string | Token para correlacionar con SMS (opcional) |
+  | `ordered_at` | datetime | Fecha/hora de creación de la orden |
+  | `expires_at` | datetime | Fecha/hora de expiración (opcional) |
+  | `products` | array | Lista de productos en la orden |
+  | `products[].code` | string | Código del producto |
+  | `products[].name` | string | Nombre del producto |
+  | `products[].price` | float | Precio unitario |
+  | `products[].quantity` | int | Cantidad |
+  | `products[].line_total` | float | Total de la línea (price × quantity) |
+  
+  ## Respuesta 201 - PurchaseOrderResponse
+  ```json
+  {
+    "id": "uuid",
+    "order_number": "ORD-2025-001",
+    "id_pos": "pos-terminal-001",
+    "amount": 50000.00,
+    "status": "PENDING",
+    "payment_method": "SINPE_MOVIL",
+    "correlation_token": "uuid",
+    "products": [...],
+    "ordered_at": "2025-01-01T10:00:00",
+    "expires_at": "2025-01-01T10:15:00",
+    "created_at": "2025-01-01T10:00:01"
+  }
+  ```
+}

@@ -1,0 +1,42 @@
+meta {
+  name: DELETE - Eliminar Upload
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/uploads/{{uploadId}}
+  body: none
+  auth: none
+}
+
+headers {
+  x-api-key: {{apiKey}}
+  x-correlation-id: {{correlationId}}
+  x-request-id: req-delete-upload-001
+}
+
+docs {
+  # DELETE /api/v1/uploads/{upload_id} — Eliminar Archivo Subido
+  
+  Elimina un archivo subido previamente del storage.
+  
+  ## Path Parameter
+  | Parámetro | Tipo | Descripción |
+  |-----------|------|-------------|
+  | `upload_id` | string | UUID del upload a eliminar |
+  
+  ## Respuesta 204 - No Content
+  Sin cuerpo de respuesta. El archivo fue eliminado exitosamente.
+  
+  ## Respuesta 404
+  ```json
+  {
+    "detail": "Upload not found"
+  }
+  ```
+  
+  ## ⚠️ Acción irreversible
+  La eliminación es permanente. Si Cloudflare R2 está habilitado (`ENABLE_R2_STORAGE=True`),
+  también se elimina del bucket remoto.
+}

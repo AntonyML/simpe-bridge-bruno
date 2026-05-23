@@ -1,0 +1,59 @@
+meta {
+  name: GET - Listar Órdenes por POS
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/orders
+  body: none
+  auth: none
+}
+
+params:query {
+  id_pos: {{idPos}}
+  limit: 50
+  offset: 0
+}
+
+headers {
+  x-api-key: {{apiKey}}
+  x-correlation-id: {{correlationId}}
+  x-request-id: req-list-orders-001
+}
+
+docs {
+  # GET /api/v1/orders — Listar Órdenes de un POS
+  
+  Retorna todas las órdenes de compra asociadas a un POS específico.
+  Útil para el panel de administración del POS y para reconciliación.
+  
+  ## Query Parameters
+  | Parámetro | Tipo | Requerido | Descripción |
+  |-----------|------|-----------|-------------|
+  | `id_pos` | string | ✅ Sí | Identificador del POS |
+  | `limit` | int | No (default 50) | Máximo resultados (1-200) |
+  | `offset` | int | No (default 0) | Paginación |
+  
+  ## Respuesta 200
+  ```json
+  [
+    {
+      "id": "uuid",
+      "order_number": "ORD-2025-001",
+      "id_pos": "pos-terminal-001",
+      "amount": 50000.00,
+      "status": "PENDING",
+      "payment_method": "SINPE_MOVIL",
+      "correlation_token": null,
+      "products": [],
+      "ordered_at": "2025-01-01T10:00:00",
+      "expires_at": "2025-01-01T10:15:00",
+      "created_at": "2025-01-01T10:00:01"
+    }
+  ]
+  ```
+  
+  ## Tip: Filtrar órdenes pendientes
+  Si el backend implementa filtros futuros, agregar `status=PENDING` como query param.
+}

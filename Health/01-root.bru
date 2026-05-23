@@ -1,0 +1,37 @@
+meta {
+  name: Root - Service Info
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/
+  body: none
+  auth: none
+}
+
+headers {
+  x-api-key: {{apiKey}}
+  x-correlation-id: {{correlationId}}
+}
+
+docs {
+  # Root Endpoint
+  
+  Devuelve información básica del servicio SINPE Bridge API.
+  
+  **Respuesta esperada:**
+  ```json
+  {
+    "service": "SINPE Bridge API",
+    "status": "running",
+    "version": "1.0.0"
+  }
+  ```
+  
+  > ⚠️ **NOTA PROXY**: Este endpoint pasa por el Worker de Cloudflare.
+  > El Worker reenvía `api.tonyml.com/api/*` → backend.
+  > El path `/` no coincide con el patrón `/api/*`, por lo que
+  > puede no estar disponible directamente desde `api.tonyml.com`.
+  > Probar vía environment `github-codespace` o `local-fastapi`.
+}

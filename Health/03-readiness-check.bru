@@ -1,0 +1,41 @@
+meta {
+  name: Readiness Check
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/ready
+  body: none
+  auth: none
+}
+
+headers {
+  x-api-key: {{apiKey}}
+  x-correlation-id: {{correlationId}}
+}
+
+docs {
+  # Readiness Check
+  
+  Endpoint de readiness probe. Verifica que el servicio está listo para recibir tráfico
+  (incluye verificación de conectividad con la base de datos cuando esté implementada).
+  
+  **Respuesta 200 - Ready:**
+  ```json
+  {
+    "status": "ready",
+    "timestamp": "2025-01-01T12:00:00.000000"
+  }
+  ```
+  
+  **Respuesta 503 - Not Ready:**
+  ```json
+  {
+    "status": "not ready",
+    "reason": "Database connection failed"
+  }
+  ```
+  
+  > ⚠️ **NOTA**: Mismo caso que `/health` — no pasa por el Worker proxy.
+}

@@ -1,0 +1,54 @@
+meta {
+  name: GET - Consultar Mensaje por ID
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/payments/{{messageId}}
+  body: none
+  auth: none
+}
+
+headers {
+  x-api-key: {{apiKey}}
+  x-correlation-id: {{correlationId}}
+  x-request-id: req-get-payment-001
+  x-trace-id: trace-get-payment-001
+}
+
+docs {
+  # GET /api/v1/payments/{message_id} — Consultar Mensaje SINPE
+  
+  Recupera los datos de un mensaje SINPE específico por su `message_id` (UUID).
+  
+  ## Path Parameter
+  | Parámetro | Tipo | Descripción |
+  |-----------|------|-------------|
+  | `message_id` | UUID | UUID único del mensaje SINPE |
+  
+  ## Respuesta 200 - SinpeMessageResponse
+  ```json
+  {
+    "id": "uuid",
+    "message_id": "89d05111-5134-4e81-a8b4-7d70c25627ab",
+    "id_pos": "pos-terminal-001",
+    "body": "BCR le informa...",
+    "sender": "+50689649721",
+    "message_timestamp": "2025-01-01T10:00:00",
+    "processed": true,
+    "received_at": "2025-01-01T10:00:01",
+    "purchase_order_id": "uuid-de-la-orden"
+  }
+  ```
+  
+  ## Respuesta 404
+  ```json
+  {
+    "detail": "Not found"
+  }
+  ```
+  
+  ## Uso del variable {{messageId}}
+  Editar la variable en el environment activo para consultar diferentes mensajes.
+}

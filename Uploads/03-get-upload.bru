@@ -1,0 +1,48 @@
+meta {
+  name: GET - Obtener Metadata de Upload
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/uploads/{{uploadId}}
+  body: none
+  auth: none
+}
+
+headers {
+  x-api-key: {{apiKey}}
+  x-correlation-id: {{correlationId}}
+  x-request-id: req-get-upload-001
+}
+
+docs {
+  # GET /api/v1/uploads/{upload_id} — Obtener Metadata de Upload
+  
+  Recupera la metadata de un archivo subido previamente.
+  
+  ## Path Parameter
+  | Parámetro | Tipo | Descripción |
+  |-----------|------|-------------|
+  | `upload_id` | string | UUID del upload retornado al subir el archivo |
+  
+  ## Respuesta 200
+  ```json
+  {
+    "upload_id": "uuid",
+    "file_path": "/uploads/receipts/2025/01/01/uuid.jpg",
+    "correlation_id": "uuid"
+  }
+  ```
+  
+  ## Respuesta 404
+  ```json
+  {
+    "detail": "Upload not found"
+  }
+  ```
+  
+  ## Nota de implementación
+  La respuesta actual es básica (solo path + correlation_id).
+  Una implementación completa consultaría la DB para retornar todos los campos de UploadResponse.
+}

@@ -1,0 +1,39 @@
+meta {
+  name: GET - Swagger UI (Docs)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/docs
+  body: none
+  auth: none
+}
+
+headers {
+  x-api-key: {{apiKey}}
+}
+
+docs {
+  # GET /api/v1/docs — Swagger UI
+  
+  Interfaz Swagger/OpenAPI generada automáticamente por FastAPI.
+  Disponible directamente en el backend (Codespace o local).
+  
+  Configurado en `main.py`:
+  ```python
+  app = FastAPI(
+    docs_url="/api/v1/docs",
+    openapi_url="/api/v1/openapi.json",
+    redoc_url=None,  # ReDoc deshabilitado
+  )
+  ```
+  
+  ## Nota
+  Este endpoint sirve HTML, no JSON. Abrirlo directamente en el navegador:
+  - Local: http://localhost:8000/api/v1/docs
+  - Codespace: https://super-duper-space-broccoli-gg49xpjx57jfp774-8000.app.github.dev/api/v1/docs
+  
+  > ⚠️ El Worker proxy solo intercepta `api.tonyml.com/api/*` → los docs
+  > están disponibles en el backend directamente, no en api.tonyml.com.
+}

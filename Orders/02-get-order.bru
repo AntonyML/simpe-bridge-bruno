@@ -1,0 +1,61 @@
+meta {
+  name: GET - Obtener Orden por Número
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/orders/{{orderNumber}}
+  body: none
+  auth: none
+}
+
+headers {
+  x-api-key: {{apiKey}}
+  x-correlation-id: {{correlationId}}
+  x-request-id: req-get-order-001
+}
+
+docs {
+  # GET /api/v1/orders/{order_number} — Obtener Orden de Compra
+  
+  Recupera una orden de compra por su número de orden.
+  
+  ## Path Parameter
+  | Parámetro | Tipo | Descripción |
+  |-----------|------|-------------|
+  | `order_number` | string | Número de orden del POS (ej: "ORD-2025-001") |
+  
+  ## Respuesta 200 - PurchaseOrderResponse
+  ```json
+  {
+    "id": "uuid",
+    "order_number": "ORD-2025-001",
+    "id_pos": "pos-terminal-001",
+    "amount": 50000.00,
+    "status": "PAID",
+    "payment_method": "SINPE_MOVIL",
+    "correlation_token": "uuid",
+    "products": [
+      {
+        "code": "PROD-001",
+        "name": "Casado con pollo",
+        "price": 4500.00,
+        "quantity": 2,
+        "line_total": 9000.00
+      }
+    ],
+    "ordered_at": "2025-01-01T10:00:00",
+    "expires_at": "2025-01-01T10:15:00",
+    "created_at": "2025-01-01T10:00:01"
+  }
+  ```
+  
+  ## Estados posibles de la orden
+  | Status | Descripción |
+  |--------|-------------|
+  | `PENDING` | Esperando pago |
+  | `PAID` | Pago conciliado con SINPE |
+  | `EXPIRED` | La orden expiró sin pago |
+  | `CANCELLED` | Cancelada manualmente |
+}

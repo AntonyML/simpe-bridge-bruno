@@ -1,0 +1,57 @@
+meta {
+  name: Proxy - CORS Preflight (OPTIONS)
+  type: http
+  seq: 2
+}
+
+options {
+  url: {{baseUrl}}/api/v1/payments
+  body: none
+  auth: none
+}
+
+headers {
+  Origin: http://localhost:3000
+  Access-Control-Request-Method: POST
+  Access-Control-Request-Headers: Content-Type, x-api-key, x-correlation-id
+}
+
+docs {
+  # Proxy - CORS Preflight OPTIONS
+
+  Simula el preflight CORS que el navegador envía antes de requests cross-origin.
+
+  ## ¿Qué valida?
+  Verifica que el Worker (worker_backup.js) responde correctamente al OPTIONS con:
+  - Status `204 No Content`
+  - Headers CORS apropiados
+
+  ## Respuesta esperada — 204
+
+  ```
+  HTTP/1.1 204 No Content
+  Access-Control-Allow-Origin: http://localhost:3000
+  Access-Control-Allow-Methods: GET, POST, PUT, PATCH, OPTIONS
+  Access-Control-Allow-Headers: Content-Type, x-api-key, x-signature, x-correlation-id, x-request-id, x-trace-id
+  Access-Control-Max-Age: 86400
+  ```
+
+  ## Orígenes permitidos (del worker_backup.js)
+
+  ```javascript
+  const ALLOWED_ORIGINS = [
+    "capacitor://localhost",   // App Ionic/Capacitor
+    "ionic://localhost",       // App Ionic
+    "file://",                 // WebView local
+    "http://localhost:3000",   // Dev frontend
+    "http://localhost:8080",   // Dev alternativo
+  ];
+  ```
+
+  ## Si retorna 403 — Origin not allowed
+  El origen del request no está en la lista `ALLOWED_ORIGINS` del Worker.
+  Agregar el origen requerido en `worker_backup.js`.
+
+  > ⚠️ El `worker.js` actual (producción) NO tiene validación de CORS.
+  > Este test es relevante si se despliega `worker_backup.js`.
+}
